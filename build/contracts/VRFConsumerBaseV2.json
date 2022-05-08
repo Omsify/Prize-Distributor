@@ -1,0 +1,749 @@
+{
+  "contractName": "VRFConsumerBaseV2",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "have",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "want",
+          "type": "address"
+        }
+      ],
+      "name": "OnlyCoordinatorCanFulfill",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "requestId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "randomWords",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "rawFulfillRandomWords",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"have\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"want\",\"type\":\"address\"}],\"name\":\"OnlyCoordinatorCanFulfill\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"requestId\",\"type\":\"uint256\"},{\"internalType\":\"uint256[]\",\"name\":\"randomWords\",\"type\":\"uint256[]\"}],\"name\":\"rawFulfillRandomWords\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"PURPOSEReggie the Random Oracle (not his real job) wants to provide randomnessto Vera the verifier in such a way that Vera can be sure he's notmaking his output up to suit himself. Reggie provides Vera a public keyto which he knows the secret key. Each time Vera provides a seed toReggie, he gives back a value which is computed completelydeterministically from the seed and the secret key.Reggie provides a proof by which Vera can verify that the output wascorrectly computed once Reggie tells it to her, but without that proof,the output is indistinguishable to her from a uniform random samplefrom the output space.The purpose of this contract is to make it easy for unrelated contractsto talk to Vera the verifier about the work Reggie is doing, to providesimple access to a verifiable source of randomness. It ensures 2 things:1. The fulfillment came from the VRFCoordinator2. The consumer contract implements fulfillRandomWords. *****************************************************************************USAGECalling contracts must inherit from VRFConsumerBase, and caninitialize VRFConsumerBase's attributes in their constructor asshown:contract VRFConsumer {constructor(<other arguments>, address _vrfCoordinator, address _link)VRFConsumerBase(_vrfCoordinator) public {<initialization with other arguments goes here>}}The oracle will have given you an ID for the VRF keypair they havecommitted to (let's call it keyHash). Create subscription, fund itand your consumer contract as a consumer of it (see VRFCoordinatorInterfacesubscription management functions).Call requestRandomWords(keyHash, subId, minimumRequestConfirmations,callbackGasLimit, numWords),see (VRFCoordinatorInterface for a description of the arguments).Once the VRFCoordinator has received and validated the oracle's responseto your request, it will call your contract's fulfillRandomWords method.The randomness argument to fulfillRandomWords is a set of random wordsgenerated from your requestId and the blockHash of the request.If your contract could have concurrent requests open, you can use therequestId returned from requestRandomWords to track which response is associatedwith which randomness request.See \\\"SECURITY CONSIDERATIONS\\\" for principles to keep in mind,if your contract could have multiple requests in flight simultaneously.Colliding `requestId`s are cryptographically impossible as long as seedsdiffer. *****************************************************************************SECURITY CONSIDERATIONSA method with the ability to call your fulfillRandomness method directlycould spoof a VRF response with any random value, so it's critical thatit cannot be directly called by anything other than this base contract(specifically, by the VRFConsumerBase.rawFulfillRandomness method).For your users to trust that your contract's random behavior is freefrom malicious interference, it's best if you can write it so that allbehaviors implied by a VRF response are executed *during* yourfulfillRandomness method. If your contract must store the response (oranything derived from it) and use it later, you must ensure that anyuser-significant behavior which depends on that stored value cannot bemanipulated by a subsequent VRF request.Similarly, both miners and the VRF oracle itself have some influenceover the order in which VRF responses appear on the blockchain, so ifyour contract could have multiple VRF requests in flight simultaneously,you must ensure that the order in which the VRF responses arrive cannotbe used to manipulate your contract's user-significant behavior.Since the block hash of the block which contains the requestRandomnesscall is mixed into the input to the VRF *last*, a sufficiently powerfulminer could, in principle, fork the blockchain to evict the blockcontaining the request, forcing the request to be included in adifferent block with a different hash, and therefore a different inputto the VRF. However, such an attack would incur a substantial economiccost. This cost scales with the number of blocks the VRF oracle waitsuntil it calls responds to a request. It is for this reason thatthat you can signal to an oracle you'd like them to wait longer beforeresponding to the request (however this is not enforced in the contractand so remains effective only in the case of unmodified oracle software).\",\"kind\":\"dev\",\"methods\":{\"constructor\":{\"params\":{\"_vrfCoordinator\":\"address of VRFCoordinator contract\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"notice\":\"****************************************************************************Interface for contracts using VRF randomness *****************************************************************************\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/imported/VRFConsumerBaseV2.sol\":\"VRFConsumerBaseV2\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/imported/VRFConsumerBaseV2.sol\":{\"keccak256\":\"0x142d3297368b1633cd703862cb0288cb2246a5ca20d8ae946a2348cecfa8828f\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://9f6ac1b8392f3d36f48bc9bf02e9c7bcd46ffd83815f6a453df6a6983924cbfb\",\"dweb:/ipfs/QmR4enP57EFQz6WPvs2JKbXfQs6JAKXJJ7qVZfBkJcBEXd\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.4;\r\n\r\n/** ****************************************************************************\r\n * @notice Interface for contracts using VRF randomness\r\n * *****************************************************************************\r\n * @dev PURPOSE\r\n *\r\n * @dev Reggie the Random Oracle (not his real job) wants to provide randomness\r\n * @dev to Vera the verifier in such a way that Vera can be sure he's not\r\n * @dev making his output up to suit himself. Reggie provides Vera a public key\r\n * @dev to which he knows the secret key. Each time Vera provides a seed to\r\n * @dev Reggie, he gives back a value which is computed completely\r\n * @dev deterministically from the seed and the secret key.\r\n *\r\n * @dev Reggie provides a proof by which Vera can verify that the output was\r\n * @dev correctly computed once Reggie tells it to her, but without that proof,\r\n * @dev the output is indistinguishable to her from a uniform random sample\r\n * @dev from the output space.\r\n *\r\n * @dev The purpose of this contract is to make it easy for unrelated contracts\r\n * @dev to talk to Vera the verifier about the work Reggie is doing, to provide\r\n * @dev simple access to a verifiable source of randomness. It ensures 2 things:\r\n * @dev 1. The fulfillment came from the VRFCoordinator\r\n * @dev 2. The consumer contract implements fulfillRandomWords.\r\n * *****************************************************************************\r\n * @dev USAGE\r\n *\r\n * @dev Calling contracts must inherit from VRFConsumerBase, and can\r\n * @dev initialize VRFConsumerBase's attributes in their constructor as\r\n * @dev shown:\r\n *\r\n * @dev   contract VRFConsumer {\r\n * @dev     constructor(<other arguments>, address _vrfCoordinator, address _link)\r\n * @dev       VRFConsumerBase(_vrfCoordinator) public {\r\n * @dev         <initialization with other arguments goes here>\r\n * @dev       }\r\n * @dev   }\r\n *\r\n * @dev The oracle will have given you an ID for the VRF keypair they have\r\n * @dev committed to (let's call it keyHash). Create subscription, fund it\r\n * @dev and your consumer contract as a consumer of it (see VRFCoordinatorInterface\r\n * @dev subscription management functions).\r\n * @dev Call requestRandomWords(keyHash, subId, minimumRequestConfirmations,\r\n * @dev callbackGasLimit, numWords),\r\n * @dev see (VRFCoordinatorInterface for a description of the arguments).\r\n *\r\n * @dev Once the VRFCoordinator has received and validated the oracle's response\r\n * @dev to your request, it will call your contract's fulfillRandomWords method.\r\n *\r\n * @dev The randomness argument to fulfillRandomWords is a set of random words\r\n * @dev generated from your requestId and the blockHash of the request.\r\n *\r\n * @dev If your contract could have concurrent requests open, you can use the\r\n * @dev requestId returned from requestRandomWords to track which response is associated\r\n * @dev with which randomness request.\r\n * @dev See \"SECURITY CONSIDERATIONS\" for principles to keep in mind,\r\n * @dev if your contract could have multiple requests in flight simultaneously.\r\n *\r\n * @dev Colliding `requestId`s are cryptographically impossible as long as seeds\r\n * @dev differ.\r\n *\r\n * *****************************************************************************\r\n * @dev SECURITY CONSIDERATIONS\r\n *\r\n * @dev A method with the ability to call your fulfillRandomness method directly\r\n * @dev could spoof a VRF response with any random value, so it's critical that\r\n * @dev it cannot be directly called by anything other than this base contract\r\n * @dev (specifically, by the VRFConsumerBase.rawFulfillRandomness method).\r\n *\r\n * @dev For your users to trust that your contract's random behavior is free\r\n * @dev from malicious interference, it's best if you can write it so that all\r\n * @dev behaviors implied by a VRF response are executed *during* your\r\n * @dev fulfillRandomness method. If your contract must store the response (or\r\n * @dev anything derived from it) and use it later, you must ensure that any\r\n * @dev user-significant behavior which depends on that stored value cannot be\r\n * @dev manipulated by a subsequent VRF request.\r\n *\r\n * @dev Similarly, both miners and the VRF oracle itself have some influence\r\n * @dev over the order in which VRF responses appear on the blockchain, so if\r\n * @dev your contract could have multiple VRF requests in flight simultaneously,\r\n * @dev you must ensure that the order in which the VRF responses arrive cannot\r\n * @dev be used to manipulate your contract's user-significant behavior.\r\n *\r\n * @dev Since the block hash of the block which contains the requestRandomness\r\n * @dev call is mixed into the input to the VRF *last*, a sufficiently powerful\r\n * @dev miner could, in principle, fork the blockchain to evict the block\r\n * @dev containing the request, forcing the request to be included in a\r\n * @dev different block with a different hash, and therefore a different input\r\n * @dev to the VRF. However, such an attack would incur a substantial economic\r\n * @dev cost. This cost scales with the number of blocks the VRF oracle waits\r\n * @dev until it calls responds to a request. It is for this reason that\r\n * @dev that you can signal to an oracle you'd like them to wait longer before\r\n * @dev responding to the request (however this is not enforced in the contract\r\n * @dev and so remains effective only in the case of unmodified oracle software).\r\n */\r\nabstract contract VRFConsumerBaseV2 {\r\n    error OnlyCoordinatorCanFulfill(address have, address want);\r\n    address private immutable vrfCoordinator;\r\n\r\n    /**\r\n     * @param _vrfCoordinator address of VRFCoordinator contract\r\n     */\r\n    constructor(address _vrfCoordinator) {\r\n        vrfCoordinator = _vrfCoordinator;\r\n    }\r\n\r\n    /**\r\n     * @notice fulfillRandomness handles the VRF response. Your contract must\r\n     * @notice implement it. See \"SECURITY CONSIDERATIONS\" above for important\r\n     * @notice principles to keep in mind when implementing your fulfillRandomness\r\n     * @notice method.\r\n     *\r\n     * @dev VRFConsumerBaseV2 expects its subcontracts to have a method with this\r\n     * @dev signature, and will call it once it has verified the proof\r\n     * @dev associated with the randomness. (It is triggered via a call to\r\n     * @dev rawFulfillRandomness, below.)\r\n     *\r\n     * @param requestId The Id initially returned by requestRandomness\r\n     * @param randomWords the VRF output expanded to the requested number of words\r\n     */\r\n    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords)\r\n        internal\r\n        virtual;\r\n\r\n    // rawFulfillRandomness is called by VRFCoordinator when it receives a valid VRF\r\n    // proof. rawFulfillRandomness then calls fulfillRandomness, after validating\r\n    // the origin of the call\r\n    function rawFulfillRandomWords(\r\n        uint256 requestId,\r\n        uint256[] memory randomWords\r\n    ) external {\r\n        if (msg.sender != vrfCoordinator) {\r\n            revert OnlyCoordinatorCanFulfill(msg.sender, vrfCoordinator);\r\n        }\r\n        fulfillRandomWords(requestId, randomWords);\r\n    }\r\n}\r\n",
+  "sourcePath": "C:\\Users\\badza\\Desktop\\Crypto\\Solidity\\ChainlinkHackathon2022\\prize-distributor\\contracts\\imported\\VRFConsumerBaseV2.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/imported/VRFConsumerBaseV2.sol",
+    "exportedSymbols": {
+      "VRFConsumerBaseV2": [
+        727
+      ]
+    },
+    "id": 728,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 671,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".4"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:23:6"
+      },
+      {
+        "abstract": true,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 672,
+          "nodeType": "StructuredDocumentation",
+          "src": "60:5367:6",
+          "text": "****************************************************************************\n @notice Interface for contracts using VRF randomness\n *****************************************************************************\n @dev PURPOSE\n @dev Reggie the Random Oracle (not his real job) wants to provide randomness\n @dev to Vera the verifier in such a way that Vera can be sure he's not\n @dev making his output up to suit himself. Reggie provides Vera a public key\n @dev to which he knows the secret key. Each time Vera provides a seed to\n @dev Reggie, he gives back a value which is computed completely\n @dev deterministically from the seed and the secret key.\n @dev Reggie provides a proof by which Vera can verify that the output was\n @dev correctly computed once Reggie tells it to her, but without that proof,\n @dev the output is indistinguishable to her from a uniform random sample\n @dev from the output space.\n @dev The purpose of this contract is to make it easy for unrelated contracts\n @dev to talk to Vera the verifier about the work Reggie is doing, to provide\n @dev simple access to a verifiable source of randomness. It ensures 2 things:\n @dev 1. The fulfillment came from the VRFCoordinator\n @dev 2. The consumer contract implements fulfillRandomWords.\n *****************************************************************************\n @dev USAGE\n @dev Calling contracts must inherit from VRFConsumerBase, and can\n @dev initialize VRFConsumerBase's attributes in their constructor as\n @dev shown:\n @dev   contract VRFConsumer {\n @dev     constructor(<other arguments>, address _vrfCoordinator, address _link)\n @dev       VRFConsumerBase(_vrfCoordinator) public {\n @dev         <initialization with other arguments goes here>\n @dev       }\n @dev   }\n @dev The oracle will have given you an ID for the VRF keypair they have\n @dev committed to (let's call it keyHash). Create subscription, fund it\n @dev and your consumer contract as a consumer of it (see VRFCoordinatorInterface\n @dev subscription management functions).\n @dev Call requestRandomWords(keyHash, subId, minimumRequestConfirmations,\n @dev callbackGasLimit, numWords),\n @dev see (VRFCoordinatorInterface for a description of the arguments).\n @dev Once the VRFCoordinator has received and validated the oracle's response\n @dev to your request, it will call your contract's fulfillRandomWords method.\n @dev The randomness argument to fulfillRandomWords is a set of random words\n @dev generated from your requestId and the blockHash of the request.\n @dev If your contract could have concurrent requests open, you can use the\n @dev requestId returned from requestRandomWords to track which response is associated\n @dev with which randomness request.\n @dev See \"SECURITY CONSIDERATIONS\" for principles to keep in mind,\n @dev if your contract could have multiple requests in flight simultaneously.\n @dev Colliding `requestId`s are cryptographically impossible as long as seeds\n @dev differ.\n *****************************************************************************\n @dev SECURITY CONSIDERATIONS\n @dev A method with the ability to call your fulfillRandomness method directly\n @dev could spoof a VRF response with any random value, so it's critical that\n @dev it cannot be directly called by anything other than this base contract\n @dev (specifically, by the VRFConsumerBase.rawFulfillRandomness method).\n @dev For your users to trust that your contract's random behavior is free\n @dev from malicious interference, it's best if you can write it so that all\n @dev behaviors implied by a VRF response are executed *during* your\n @dev fulfillRandomness method. If your contract must store the response (or\n @dev anything derived from it) and use it later, you must ensure that any\n @dev user-significant behavior which depends on that stored value cannot be\n @dev manipulated by a subsequent VRF request.\n @dev Similarly, both miners and the VRF oracle itself have some influence\n @dev over the order in which VRF responses appear on the blockchain, so if\n @dev your contract could have multiple VRF requests in flight simultaneously,\n @dev you must ensure that the order in which the VRF responses arrive cannot\n @dev be used to manipulate your contract's user-significant behavior.\n @dev Since the block hash of the block which contains the requestRandomness\n @dev call is mixed into the input to the VRF *last*, a sufficiently powerful\n @dev miner could, in principle, fork the blockchain to evict the block\n @dev containing the request, forcing the request to be included in a\n @dev different block with a different hash, and therefore a different input\n @dev to the VRF. However, such an attack would incur a substantial economic\n @dev cost. This cost scales with the number of blocks the VRF oracle waits\n @dev until it calls responds to a request. It is for this reason that\n @dev that you can signal to an oracle you'd like them to wait longer before\n @dev responding to the request (however this is not enforced in the contract\n @dev and so remains effective only in the case of unmodified oracle software)."
+        },
+        "fullyImplemented": false,
+        "id": 727,
+        "linearizedBaseContracts": [
+          727
+        ],
+        "name": "VRFConsumerBaseV2",
+        "nameLocation": "5447:17:6",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "id": 678,
+            "name": "OnlyCoordinatorCanFulfill",
+            "nameLocation": "5478:25:6",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 677,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 674,
+                  "mutability": "mutable",
+                  "name": "have",
+                  "nameLocation": "5512:4:6",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 678,
+                  "src": "5504:12:6",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 673,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "5504:7:6",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 676,
+                  "mutability": "mutable",
+                  "name": "want",
+                  "nameLocation": "5526:4:6",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 678,
+                  "src": "5518:12:6",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 675,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "5518:7:6",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "5503:28:6"
+            },
+            "src": "5472:60:6"
+          },
+          {
+            "constant": false,
+            "id": 680,
+            "mutability": "immutable",
+            "name": "vrfCoordinator",
+            "nameLocation": "5564:14:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 727,
+            "src": "5538:40:6",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 679,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "5538:7:6",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "visibility": "private"
+          },
+          {
+            "body": {
+              "id": 690,
+              "nodeType": "Block",
+              "src": "5708:51:6",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 688,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 686,
+                      "name": "vrfCoordinator",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 680,
+                      "src": "5719:14:6",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 687,
+                      "name": "_vrfCoordinator",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 683,
+                      "src": "5736:15:6",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "src": "5719:32:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "id": 689,
+                  "nodeType": "ExpressionStatement",
+                  "src": "5719:32:6"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 681,
+              "nodeType": "StructuredDocumentation",
+              "src": "5587:78:6",
+              "text": " @param _vrfCoordinator address of VRFCoordinator contract"
+            },
+            "id": 691,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 684,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 683,
+                  "mutability": "mutable",
+                  "name": "_vrfCoordinator",
+                  "nameLocation": "5691:15:6",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 691,
+                  "src": "5683:23:6",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 682,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "5683:7:6",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "5682:25:6"
+            },
+            "returnParameters": {
+              "id": 685,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "5708:0:6"
+            },
+            "scope": 727,
+            "src": "5671:88:6",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "documentation": {
+              "id": 692,
+              "nodeType": "StructuredDocumentation",
+              "src": "5767:725:6",
+              "text": " @notice fulfillRandomness handles the VRF response. Your contract must\n @notice implement it. See \"SECURITY CONSIDERATIONS\" above for important\n @notice principles to keep in mind when implementing your fulfillRandomness\n @notice method.\n @dev VRFConsumerBaseV2 expects its subcontracts to have a method with this\n @dev signature, and will call it once it has verified the proof\n @dev associated with the randomness. (It is triggered via a call to\n @dev rawFulfillRandomness, below.)\n @param requestId The Id initially returned by requestRandomness\n @param randomWords the VRF output expanded to the requested number of words"
+            },
+            "id": 700,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "fulfillRandomWords",
+            "nameLocation": "6507:18:6",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 698,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 694,
+                  "mutability": "mutable",
+                  "name": "requestId",
+                  "nameLocation": "6534:9:6",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 700,
+                  "src": "6526:17:6",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 693,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "6526:7:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 697,
+                  "mutability": "mutable",
+                  "name": "randomWords",
+                  "nameLocation": "6562:11:6",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 700,
+                  "src": "6545:28:6",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint256_$dyn_memory_ptr",
+                    "typeString": "uint256[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 695,
+                      "name": "uint256",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "6545:7:6",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 696,
+                    "nodeType": "ArrayTypeName",
+                    "src": "6545:9:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
+                      "typeString": "uint256[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "6525:49:6"
+            },
+            "returnParameters": {
+              "id": 699,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "6609:0:6"
+            },
+            "scope": 727,
+            "src": "6498:112:6",
+            "stateMutability": "nonpayable",
+            "virtual": true,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 725,
+              "nodeType": "Block",
+              "src": "6932:192:6",
+              "statements": [
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    },
+                    "id": 711,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "expression": {
+                        "id": 708,
+                        "name": "msg",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 4294967281,
+                        "src": "6947:3:6",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_magic_message",
+                          "typeString": "msg"
+                        }
+                      },
+                      "id": 709,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "sender",
+                      "nodeType": "MemberAccess",
+                      "src": "6947:10:6",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "!=",
+                    "rightExpression": {
+                      "id": 710,
+                      "name": "vrfCoordinator",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 680,
+                      "src": "6961:14:6",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "src": "6947:28:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 719,
+                  "nodeType": "IfStatement",
+                  "src": "6943:121:6",
+                  "trueBody": {
+                    "id": 718,
+                    "nodeType": "Block",
+                    "src": "6977:87:6",
+                    "statements": [
+                      {
+                        "errorCall": {
+                          "arguments": [
+                            {
+                              "expression": {
+                                "id": 713,
+                                "name": "msg",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 4294967281,
+                                "src": "7025:3:6",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_magic_message",
+                                  "typeString": "msg"
+                                }
+                              },
+                              "id": 714,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "memberName": "sender",
+                              "nodeType": "MemberAccess",
+                              "src": "7025:10:6",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_address",
+                                "typeString": "address"
+                              }
+                            },
+                            {
+                              "id": 715,
+                              "name": "vrfCoordinator",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 680,
+                              "src": "7037:14:6",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_address",
+                                "typeString": "address"
+                              }
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_address",
+                                "typeString": "address"
+                              },
+                              {
+                                "typeIdentifier": "t_address",
+                                "typeString": "address"
+                              }
+                            ],
+                            "id": 712,
+                            "name": "OnlyCoordinatorCanFulfill",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 678,
+                            "src": "6999:25:6",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_error_pure$_t_address_$_t_address_$returns$__$",
+                              "typeString": "function (address,address) pure"
+                            }
+                          },
+                          "id": 716,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "6999:53:6",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_tuple$__$",
+                            "typeString": "tuple()"
+                          }
+                        },
+                        "id": 717,
+                        "nodeType": "RevertStatement",
+                        "src": "6992:60:6"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 721,
+                        "name": "requestId",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 702,
+                        "src": "7093:9:6",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "id": 722,
+                        "name": "randomWords",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 705,
+                        "src": "7104:11:6",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_array$_t_uint256_$dyn_memory_ptr",
+                          "typeString": "uint256[] memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        {
+                          "typeIdentifier": "t_array$_t_uint256_$dyn_memory_ptr",
+                          "typeString": "uint256[] memory"
+                        }
+                      ],
+                      "id": 720,
+                      "name": "fulfillRandomWords",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 700,
+                      "src": "7074:18:6",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_uint256_$_t_array$_t_uint256_$dyn_memory_ptr_$returns$__$",
+                        "typeString": "function (uint256,uint256[] memory)"
+                      }
+                    },
+                    "id": 723,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "7074:42:6",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 724,
+                  "nodeType": "ExpressionStatement",
+                  "src": "7074:42:6"
+                }
+              ]
+            },
+            "functionSelector": "1fe543e3",
+            "id": 726,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "rawFulfillRandomWords",
+            "nameLocation": "6827:21:6",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 706,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 702,
+                  "mutability": "mutable",
+                  "name": "requestId",
+                  "nameLocation": "6867:9:6",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 726,
+                  "src": "6859:17:6",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 701,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "6859:7:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 705,
+                  "mutability": "mutable",
+                  "name": "randomWords",
+                  "nameLocation": "6904:11:6",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 726,
+                  "src": "6887:28:6",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint256_$dyn_memory_ptr",
+                    "typeString": "uint256[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 703,
+                      "name": "uint256",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "6887:7:6",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 704,
+                    "nodeType": "ArrayTypeName",
+                    "src": "6887:9:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
+                      "typeString": "uint256[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "6848:74:6"
+            },
+            "returnParameters": {
+              "id": 707,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "6932:0:6"
+            },
+            "scope": 727,
+            "src": "6818:306:6",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 728,
+        "src": "5429:1698:6",
+        "usedErrors": [
+          678
+        ]
+      }
+    ],
+    "src": "33:7096:6"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.7+commit.e28d00a7.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.7",
+  "updatedAt": "2022-05-08T09:04:07.280Z",
+  "devdoc": {
+    "details": "PURPOSEReggie the Random Oracle (not his real job) wants to provide randomnessto Vera the verifier in such a way that Vera can be sure he's notmaking his output up to suit himself. Reggie provides Vera a public keyto which he knows the secret key. Each time Vera provides a seed toReggie, he gives back a value which is computed completelydeterministically from the seed and the secret key.Reggie provides a proof by which Vera can verify that the output wascorrectly computed once Reggie tells it to her, but without that proof,the output is indistinguishable to her from a uniform random samplefrom the output space.The purpose of this contract is to make it easy for unrelated contractsto talk to Vera the verifier about the work Reggie is doing, to providesimple access to a verifiable source of randomness. It ensures 2 things:1. The fulfillment came from the VRFCoordinator2. The consumer contract implements fulfillRandomWords. *****************************************************************************USAGECalling contracts must inherit from VRFConsumerBase, and caninitialize VRFConsumerBase's attributes in their constructor asshown:contract VRFConsumer {constructor(<other arguments>, address _vrfCoordinator, address _link)VRFConsumerBase(_vrfCoordinator) public {<initialization with other arguments goes here>}}The oracle will have given you an ID for the VRF keypair they havecommitted to (let's call it keyHash). Create subscription, fund itand your consumer contract as a consumer of it (see VRFCoordinatorInterfacesubscription management functions).Call requestRandomWords(keyHash, subId, minimumRequestConfirmations,callbackGasLimit, numWords),see (VRFCoordinatorInterface for a description of the arguments).Once the VRFCoordinator has received and validated the oracle's responseto your request, it will call your contract's fulfillRandomWords method.The randomness argument to fulfillRandomWords is a set of random wordsgenerated from your requestId and the blockHash of the request.If your contract could have concurrent requests open, you can use therequestId returned from requestRandomWords to track which response is associatedwith which randomness request.See \"SECURITY CONSIDERATIONS\" for principles to keep in mind,if your contract could have multiple requests in flight simultaneously.Colliding `requestId`s are cryptographically impossible as long as seedsdiffer. *****************************************************************************SECURITY CONSIDERATIONSA method with the ability to call your fulfillRandomness method directlycould spoof a VRF response with any random value, so it's critical thatit cannot be directly called by anything other than this base contract(specifically, by the VRFConsumerBase.rawFulfillRandomness method).For your users to trust that your contract's random behavior is freefrom malicious interference, it's best if you can write it so that allbehaviors implied by a VRF response are executed *during* yourfulfillRandomness method. If your contract must store the response (oranything derived from it) and use it later, you must ensure that anyuser-significant behavior which depends on that stored value cannot bemanipulated by a subsequent VRF request.Similarly, both miners and the VRF oracle itself have some influenceover the order in which VRF responses appear on the blockchain, so ifyour contract could have multiple VRF requests in flight simultaneously,you must ensure that the order in which the VRF responses arrive cannotbe used to manipulate your contract's user-significant behavior.Since the block hash of the block which contains the requestRandomnesscall is mixed into the input to the VRF *last*, a sufficiently powerfulminer could, in principle, fork the blockchain to evict the blockcontaining the request, forcing the request to be included in adifferent block with a different hash, and therefore a different inputto the VRF. However, such an attack would incur a substantial economiccost. This cost scales with the number of blocks the VRF oracle waitsuntil it calls responds to a request. It is for this reason thatthat you can signal to an oracle you'd like them to wait longer beforeresponding to the request (however this is not enforced in the contractand so remains effective only in the case of unmodified oracle software).",
+    "kind": "dev",
+    "methods": {
+      "constructor": {
+        "params": {
+          "_vrfCoordinator": "address of VRFCoordinator contract"
+        }
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "notice": "****************************************************************************Interface for contracts using VRF randomness *****************************************************************************",
+    "version": 1
+  }
+}
