@@ -86,7 +86,7 @@ contract PrizeDistributor is VRFv2Consumer {
             randomWordByAddress[msg.sender] != 0,
             "Request a random number first or wait untill it's confirmed"
         );
-        address[] memory winners;
+        address[] memory winners = new address[](_winnersNum);
         for (uint256 i = 0; i < _winnersNum; i++) {
             winners[i] = _participants[
                 uint256(
@@ -101,7 +101,7 @@ contract PrizeDistributor is VRFv2Consumer {
         address[] calldata _participants,
         uint256 _winnersNum,
         uint256 _eachWinnerPrize
-    ) external {
+    ) external payable {
         distributeToAddresses(
             _eachWinnerPrize,
             getRandomWinners(_winnersNum, _participants)
