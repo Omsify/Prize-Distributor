@@ -6,11 +6,29 @@ import "./imported/IERC20.sol";
 import "./imported/IERC721.sol";
 import "./VRFv2Consumer.sol";
 
+/// @title PrizeDistributor
+/// @author OmiAkk
+/// @notice ETH is not automatically sent to winners' addresses to prevent Denial of Service
 contract PrizeDistributor is VRFv2Consumer {
-    event Transfer();
+    enum RaffleType {
+        ETH,
+        ERC20,
+        ERC721
+    }
+
+    /// @dev Amount of ether available for withdrawal by an address
+    mapping(address => uint256) private ethBalance;
+
+    event RaffleCompleted(
+        uint256 seed,
+        uint256 participantAmount,
+        RaffleType raffleType
+    );
 
     constructor(uint64 subscriptionId) VRFv2Consumer(subscriptionId) {}
 
+    /// @dev Adds a prize to each address ethBalance
+    /// @param _eachWinnerPrize ETH prize for each of the addresses
     function distributeToAddresses(
         uint256 _eachWinnerPrize,
         address[] memory _addresses
@@ -24,11 +42,13 @@ contract PrizeDistributor is VRFv2Consumer {
             currentAddress < _addresses.length;
             currentAddress++
         ) {
-            payable(_addresses[currentAddress]).transfer(_eachWinnerPrize);
+            ethBalance[_addresses[currentAddress]] += _eachWinnerPrize;
         }
-        emit Transfer();
     }
 
+    /// @dev Sends ERC20 tokens to addresses
+    /// @param _ERC20Address Address of ERC20 token to send
+    /// @param _eachWinnerPrize ERC20 amount to send to each address
     function distributeERC20ToAddresses(
         uint256 _eachWinnerPrize,
         address[] memory _addresses,
@@ -50,9 +70,11 @@ contract PrizeDistributor is VRFv2Consumer {
                 _eachWinnerPrize
             );
         }
-        emit Transfer();
     }
 
+    /// @dev Sends ERC721 tokens to addresses
+    /// @param _ERC721Address Address of ERC721 token to send
+    /// @param _tokenIDs IDs of ERC721 tokens to send to each address
     function distributeERC721ToAddresses(
         address[] memory _addresses,
         uint256[] memory _tokenIDs,
@@ -74,10 +96,11 @@ contract PrizeDistributor is VRFv2Consumer {
                 _tokenIDs[currentAddress]
             );
         }
-        emit Transfer();
     }
 
-    /// @dev Chooses winners out of participants array. Must be called after random number confirmation. One address is able to win multiple times.
+    /// @dev Chooses winners out of participants array
+    /// @notice Must be called after random number confirmation
+    /// @notice One address is able to win multiple times
     function getRandomWinners(
         uint256 _winnersNum,
         address[] memory _participants
@@ -97,6 +120,9 @@ contract PrizeDistributor is VRFv2Consumer {
         return winners;
     }
 
+    /// @dev Distributes ETH to random addresses from participants
+    /// @notice An address should request randomWords (seed) before distributing to random addresses
+    /// @notice One address is able to win multiple times
     function distributeToRandomAddresses(
         address[] calldata _participants,
         uint256 _winnersNum,
@@ -106,8 +132,17 @@ contract PrizeDistributor is VRFv2Consumer {
             _eachWinnerPrize,
             getRandomWinners(_winnersNum, _participants)
         );
+
+        emit RaffleCompleted(
+            randomWordByAddress[msg.sender],
+            _participants.length,
+            RaffleType.ETH
+        );
     }
 
+    /// @dev Distributes ERC721 tokens to random addresses from participants
+    /// @notice An address should request randomWords (seed) before distributing to random addresses
+    /// @notice One address is able to win multiple times
     function distributeERC721ToRandomAddresses(
         address[] calldata _participants,
         uint256[] calldata _tokenIDs,
@@ -118,8 +153,17 @@ contract PrizeDistributor is VRFv2Consumer {
             _tokenIDs,
             _ERC721Address
         );
+
+        emit RaffleCompleted(
+            randomWordByAddress[msg.sender],
+            _participants.length,
+            RaffleType.ERC721
+        );
     }
 
+    /// @dev Distributes ERC20 tokens to random addresses from participants
+    /// @notice An address should request randomWords (seed) before distributing to random addresses
+    /// @notice One address is able to win multiple times
     function distributeERC20ToRandomAddresses(
         address[] calldata _participants,
         uint256 _winnersNum,
@@ -131,5 +175,18 @@ contract PrizeDistributor is VRFv2Consumer {
             getRandomWinners(_winnersNum, _participants),
             _ERC20Address
         );
+
+        emit RaffleCompleted(
+            randomWordByAddress[msg.sender],
+            _participants.length,
+            RaffleType.ERC20
+        );
+    }
+
+    /// @dev Sends all ether availible to withdraw by the caller to him
+    function withdrawETH() external {
+        uint256 amount = ethBalance[msg.sender];
+        ethBalance[msg.sender] = 0;
+        payable(msg.sender).transfer(amount);
     }
 }

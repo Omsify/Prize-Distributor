@@ -62,6 +62,7 @@ contract VRFv2Consumer is VRFConsumerBaseV2 {
         addressByRequestId[requestIds[msg.sender]] = msg.sender;
     }
 
+    /// @dev Called by the Chainlink vrfCoordinator. Assigns a seed to the address of the raffle creator.
     function fulfillRandomWords(
         uint256 requestId, /* requestId */
         uint256[] memory randomWords
